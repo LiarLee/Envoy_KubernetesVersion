@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linux-deployment
+  labels:
+    app: linux
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linux
+  template:
+    metadata:
+      labels:
+        app: linux
+    spec:
+      containers:
+      - name: linux
+        image: centos:latest
+        imagePullPolicy: IfNotPresent
+        command: ["sleep"]
+        args: ["365d"]
+      - name: envoy
+        image: envoyproxy/envoy-alpine:v1.20.0
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: envoy-egress-config
+          mountPath: /etc/envoy
+ 
+      volumes:
+        - name: envoy-egress-config
+          configMap:
+            name: envoy-bootstrap-egress-config
+
+

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-ingress-deployment
+  labels:
+    app: envoy-singleingress
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: envoy-singleingress
+  template:
+    metadata:
+      labels:
+        app: envoy-singleingress
+    spec:
+      containers:
+      - name: webservice
+        image: ikubernetes/demoapp:v1.0
+        env:
+          - name: PORT
+            value: "8080"
+          - name: HOST
+            value: "0.0.0.0"
+      - name: envoy
+        image: envoyproxy/envoy-alpine:v1.20.0
+        ports:
+        - containerPort: 80
+
+        volumeMounts:
+        - name: envoy-config
+          mountPath: /etc/envoy
+
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: envoy-bootstrap-ingress-config
