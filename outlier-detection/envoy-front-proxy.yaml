@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: outlierdetection-deployment
+  labels:
+    app: front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front
+  template:
+    metadata:
+      labels:
+        app: front
+    spec:
+      containers:
+      - name: envoy
+        image: envoyproxy/envoy-alpine:v1.20.0
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: envoy-outlierdetection-config
+          mountPath: /etc/envoy
+ 
+      volumes:
+        - name: envoy-outlierdetection-config
+          configMap:
+            name: envoy-bootstrap-outlierdetection-config
+
+

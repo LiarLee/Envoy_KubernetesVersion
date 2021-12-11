@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontenvoy-deployment
+  namespace: envoy-tls
+  labels:
+    app: front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front
+  template:
+    metadata:
+      labels:
+        app: front
+    spec:
+      containers:
+      - name: envoy
+        image: envoyproxy/envoy-alpine:v1.20.0
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: envoy-tcpfront-config
+          mountPath: /etc/envoy
+ 
+      volumes:
+        - name: envoy-tcpfront-config
+          configMap:
+            name: envoy-bootstrap-tcpfront-config
+
+

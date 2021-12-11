@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: envoy-bootstrap-tcpfront-config
+  name: envoy-bootstrap-outlierdetection-config
   namespace: default
 data:
   envoy.yaml: |
@@ -34,27 +34,25 @@ data:
                   domains: ["*"]
                   routes:
                   - match: { prefix: "/" }
-                    route: { cluster: local_cluster }
+                    route: { cluster: web_cluster_01 }
               http_filters:
               - name: envoy.filters.http.router
       clusters:
-      - name: local_cluster
+      - name: web_cluster_01
         connect_timeout: 0.25s
         type: STATIC
         lb_policy: ROUND_ROBIN
         load_assignment:
-          cluster_name: local_cluster
+          cluster_name: web_cluster_01
           endpoints:
           - lb_endpoints:
             - endpoint:
                 address:
-                  socket_address: { address: 10.100.1.254, port_value: 80 }
+                  socket_address: { address: 10.100.1.38, port_value: 80 }
             - endpoint:
                 address:
                   socket_address: { address: 10.100.2.66, port_value: 80 }
-        health_checks:
-        - timeout: 1s
-          interval: 1s
-          unhealthy_threshold: 2
-          healthy_threshold: 2
-          tcp_health_check: {}
+        outlier_detection:
+          consecutive_5xx: 3
+          base_ejection_time: 10s
+          max_ejection_percent: 10

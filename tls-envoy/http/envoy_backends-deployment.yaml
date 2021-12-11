@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envoy-ingress-http
+  namespace: envoy-tls
+  labels:
+    app: envoy-ingress
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: envoy-ingress
+  template:
+    metadata:
+      labels:
+        app: envoy-ingress
+    spec:
+      containers:
+      - name: webservice
+        image: ikubernetes/servicemesh-app:latest
+        env:
+        - name: SERVICE_NAME
+          value: http

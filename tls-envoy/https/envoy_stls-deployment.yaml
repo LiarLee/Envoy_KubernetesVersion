@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envoy-ingress-https
+  namespace: envoy-tls
+  labels:
+    app: envoy-stls
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: envoy-stls
+  template:
+    metadata:
+      labels:
+        app: envoy-stls
+    spec:
+      containers:
+      - name: envoy
+        image: ikubernetes/servicemesh-app:latest
+        ports:
+        - containerPort: 443
+
+        volumeMounts:
+        - name: envoy-config
+          mountPath: /etc/envoy
+        - name: cert
+          mountPath: /etc/envoy/certs
+
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: envoy-bootstrap-ingress-config
+        - name: envoy-config
+          configMap:
+            name: envoy-bootstrap-ingress-config
